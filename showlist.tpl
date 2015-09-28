@@ -4,6 +4,7 @@
     <th>id</th>
     <th>заметка</th>
     <th>private</th>
+    <th>key</th>
     <th>edit</th>
 </tr>
 %for row in rows:

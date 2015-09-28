@@ -4,7 +4,6 @@ import bottle, sys, sqlite3
 import hashlib
 import logging
 
-
 from bottle import request, response, run, route, template, error
 
 @route('/ver')
@@ -14,11 +13,8 @@ def index():
 @route('/')
 @route('/list')
 def notesList():
-    conn = sqlite3.connect('notes.db')
-    c = conn.cursor()
     c.execute("SELECT id, note, private, short FROM notes")
     result = c.fetchall()
-    conn.close()
     output = template("showlist", rows=result)
     output = template("header") + output
     return output
@@ -30,8 +26,6 @@ def editNote():
 
 @route('/edit/<id>', method='GET')
 def editNote(id):
-    conn = sqlite3.connect('notes.db')
-    c = conn.cursor()
     #сохранение редактированной записи
     if request.GET.get('save', '').strip():
         note = request.GET.get("note", "").strip()
@@ -55,7 +49,6 @@ def editNote(id):
                       % (note, private, m.hexdigest()))
             logging.warning('insert! ')
         conn.commit()
-        conn.close()
 
         bottle.redirect("/")
         return
@@ -73,7 +66,6 @@ def editNote(id):
         else:  # новая заметка
             output = template("editnote", note="", id=0, private=0)
 
-    conn.close()
     output = template("header") + output
     return output
 
@@ -86,12 +78,9 @@ def searchByKey():
 
 @route('/demo')
 def addDemoNotes():
-    conn = sqlite3.connect('notes.db')
-    c = conn.cursor()
     c.execute('create table notes(id INTEGER primary key AUTOINCREMENT, note text not null, private bool, short char(10))')
     c.execute('''insert into notes(note, private, short) values('test!!!',0,'abc')''')
     conn.commit()
-    conn.close()
     return "<p>Demo added into DB</p>"
 
 @bottle.error(403)
@@ -113,3 +102,5 @@ else:
 
 logging.basicConfig(filename='log.txt', format=logging.BASIC_FORMAT)
 
+conn = sqlite3.connect('notes.db')
+c = conn.cursor()
