@@ -20,54 +20,54 @@ def notesList():
 
 @route('/edit')
 def editNote():
-    return editNote(0)
+    return editNote("0")
 
+
+@route('/save', method='GET')
+def saveNote(): #сохранение редактированной записи
+    note = request.GET.get("note", "").strip()
+    private = request.GET.get("private", "").strip()
+    savedId = request.GET.get("key").strip()
+
+    if savedId == "0": #если id Не был сохранен, создаем новую заметку
+        m = hashlib.md5()
+        m.update(note)
+        c.execute("INSERT INTO notes(note, private, short) VALUES(?, ?, ?)",
+                   (note, private, m.hexdigest()))
+        logging.warning('insert! ')
+    elif savedId.isdigit() and int(savedId) != 0:  #пересохраняем по id
+        c.execute('''UPDATE notes
+            SET note = ?, private = ?
+            where id = ? ''', (note, private, savedId))
+        logging.warning('update by id! ' + str(savedId))
+    elif isinstance(savedId, str): #сохраняем по хешу
+        c.execute('''UPDATE notes
+            SET note = ?, private = ?
+            where short = ? ''', (note, private, savedId))
+        logging.warning('update by hash! ' + str(savedId))
+    conn.commit()
+
+    bottle.redirect("/")
+    return
 
 @route('/edit/<id>', method='GET')
-def editNote(id):
-    #сохранение редактированной записи
-    if request.GET.get('save', '').strip():
-        note = request.GET.get("note", "").strip()
-        private = request.GET.get("private", "").strip()
-        savedId = request.GET.get("key").strip()
-
-        if (savedId != 0 and isinstance(savedId, int)):  #пересохраняем по id
-            c.execute('''UPDATE notes
-                SET note = ?, private = ?
-                where id = ? ''', (note, private, savedId))
-            logging.warning('update by id! ' + str(savedId))
-        elif isinstance(savedId, str): #сохраняем по хешу
-            c.execute('''UPDATE notes
-                SET note = ?, private = ?
-                where short = ? ''', (note, private, savedId))
-            logging.warning('update by hash! ' + str(id))
-        else:  #если id Не был сохранен, создаем новую заметку
-            m = hashlib.md5()
-            m.update(note)
-            c.execute("INSERT INTO notes(note, private, short) VALUES(?, ?, ?)",
-                       (note, private, m.hexdigest()))
-            logging.warning('insert! ')
-        conn.commit()
-
-        bottle.redirect("/")
-        return
-
-    else:  #генерируем страницу редактирования
-        result = ""
-        p = 0
-        logging.warning("gen new edit page " + str(id))
-        if id.isdigit() and int(id) != 0:  # ищем по id
-            c.execute("SELECT note, private FROM notes WHERE id = ?", (id,))
-            t = c.fetchone()
-            if isinstance(t, tuple):
-                (result, p) = t
-        elif id != "0" and isinstance(id, str):  # ищем по хэшу
-            c.execute("SELECT note, short, private FROM notes WHERE short = ?", (id,))
-            t = c.fetchone()
-            if isinstance(t, tuple):
-                (result, id, p) = t
-        #else:  # новая заметка по-умолчанию
-        output = template("editnote", note=result, id=id, private=p)
+def editNote(id): #генерируем страницу редактирования
+    result = ""
+    p = 0
+    if id.isdigit() and int(id) != 0:  # ищем по id
+        logging.warning("gen edit page id " + str(id))
+        c.execute("SELECT note, private FROM notes WHERE id = ?", (id,))
+        t = c.fetchone()
+        if isinstance(t, tuple):
+            (result, p) = t
+    elif id != "0" and isinstance(id, str):  # ищем по хэшу
+        c.execute("SELECT id, note, private FROM notes WHERE short = ?", (id,))
+        t = c.fetchone()
+        if isinstance(t, tuple):
+            (id, result, p) = t
+        logging.warning("gen edit page hash " + str(t))
+    #else:  # новая заметка по-умолчанию
+    output = template("editnote", note=result, id=id, private=p)
 
     return output
 

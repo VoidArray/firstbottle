@@ -5,7 +5,7 @@
 %else:
     <p>Редактирование</p>
 %end
-<form action="/edit" method="GET">
+<form action="/save" method="GET">
     <div>
         <p>Приватная?</b>
         %if private:
