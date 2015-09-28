@@ -33,19 +33,19 @@ def editNote(id):
 
         if (savedId != 0 and str(savedId).isdigit()):  #пересохраняем по id
             c.execute('''UPDATE notes
-                SET note = '%s', private = '%s'
-                where id = '%s' ''' % (note, private, savedId))
+                SET note = ?, private = ?
+                where id = ? ''', (note, private, savedId))
             logging.warning('update by id! ' + str(savedId))
         elif isinstance(savedId, str): #сохраняем по хешу
             c.execute('''UPDATE notes
-                SET note = '%s', private = '%s'
-                where short = '%s' ''' % (note, private, savedId))
+                SET note = ?, private = ?
+                where short = ? ''', (note, private, savedId))
             logging.warning('update by hash! ' + str(id))
         else:  #если id Не был сохранен, создаем новую заметку
             m = hashlib.md5()
             m.update(note)
-            c.execute("INSERT INTO notes(note, private, short) VALUES('%s', '%s', '%s')"
-                      % (note, private, m.hexdigest()))
+            c.execute("INSERT INTO notes(note, private, short) VALUES(?, ?, ?)",
+                       (note, private, m.hexdigest()))
             logging.warning('insert! ')
         conn.commit()
 
@@ -57,11 +57,11 @@ def editNote(id):
         priv = 0
         logging.warning("gen new edit page " + str(id))
         if id.isdigit() and int(id) != 0:  # ищем по id
-            c.execute("SELECT note, private FROM notes WHERE id = '%s'" % id)
+            c.execute("SELECT note, private FROM notes WHERE id = ?", id)
             (result, p) = c.fetchone()
             output = template("editnote", note=result, id=id, private=p)
         elif id != "0" and isinstance(id, str):  # ищем по хэшу
-            c.execute("SELECT note, short, private FROM notes WHERE short = '%s'" % id)
+            c.execute("SELECT note, short, private FROM notes WHERE short = ?", (id,))
             (result, findedid, p) = c.fetchone()
             output = template("editnote", note=result, id=findedid, private=p)
         else:  # новая заметка
