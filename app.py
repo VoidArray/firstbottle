@@ -40,7 +40,7 @@ def editNote(id):
         elif isinstance(savedId, str): #сохраняем по хешу
             c.execute('''UPDATE notes
                 SET note = '%s', private = '%s'
-                where short = '%s''''' % (note, private, savedId))
+                where short = '%s' ''' % (note, private, savedId))
             logging.warning('update by hash! ' + str(id))
         else:  #если id Не был сохранен, создаем новую заметку
             m = hashlib.md5()
@@ -75,6 +75,7 @@ def searchByKey():
     logging.warning("search for: " + key1)
     #return editNote(key1)
     return bottle.redirect("/edit/" + key1)
+
 
 @route('/demo')
 def addDemoNotes():
