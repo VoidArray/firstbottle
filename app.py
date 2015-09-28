@@ -16,7 +16,6 @@ def notesList():
     c.execute("SELECT id, note, private, short FROM notes")
     result = c.fetchall()
     output = template("showlist", rows=result)
-    output = template("header") + output
     return output
 
 @route('/edit')
@@ -54,6 +53,8 @@ def editNote(id):
         return
 
     else:  #генерируем страницу редактирования
+        result = ""
+        priv = 0
         logging.warning("gen new edit page " + str(id))
         if id.isdigit() and int(id) != 0:  # ищем по id
             c.execute("SELECT note, private FROM notes WHERE id = '%s'" % id)
@@ -66,14 +67,12 @@ def editNote(id):
         else:  # новая заметка
             output = template("editnote", note="", id=0, private=0)
 
-    output = template("header") + output
     return output
 
 @route('/key/', method='GET')
 def searchByKey():
     key1 = request.GET.get("key", "").strip()
     logging.warning("search for: " + key1)
-    #return editNote(key1)
     return bottle.redirect("/edit/" + key1)
 
 

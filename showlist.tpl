@@ -1,3 +1,5 @@
+% include("header.tpl")
+
 <p>All notes:</p>
 <table border="1">
 <tr>
@@ -36,3 +38,5 @@
         <input type="submit" name="edit" value="Редактировать"/>
     </div>
 </form>
+
+% include("footer.tpl")
