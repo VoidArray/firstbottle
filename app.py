@@ -25,7 +25,7 @@ def notesList():
 
 @route('/edit')
 def editNote():
-    editNote(0)
+    return editNote(0)
 
 
 @route('/edit/:id', method='GET')
@@ -71,11 +71,10 @@ def editNote(id):
             (result, findedid, p) = c.fetchone()
             output = template("editnote", note=result, id=findedid, private=p)
         else:  # новая заметка
-            output = template("editnote", note="a", id=111, private=1)
+            output = template("editnote", note="", id=0, private=0)
 
     conn.close()
     output = template("header") + output
-    logging.warning(output)
     return output
 
 @route('/bykey', method='GET')
