@@ -16,7 +16,7 @@ def index():
 def notesList():
     conn = sqlite3.connect('notes.db')
     c = conn.cursor()
-    c.execute("SELECT id, note, private FROM notes")
+    c.execute("SELECT id, note, private, short FROM notes")
     result = c.fetchall()
     conn.close()
     output = template("showlist", rows=result)
@@ -28,7 +28,7 @@ def editNote():
     return editNote(0)
 
 
-@route('/edit/:id', method='GET')
+@route('/edit/<id>', method='GET')
 def editNote(id):
     conn = sqlite3.connect('notes.db')
     c = conn.cursor()
@@ -36,7 +36,7 @@ def editNote(id):
     if request.GET.get('save', '').strip():
         note = request.GET.get("note", "").strip()
         private = request.GET.get("private", "").strip()
-        savedId = request.GET.get("hash").strip()
+        savedId = request.GET.get("key").strip()
 
         if (savedId != 0 and str(savedId).isdigit()):  #пересохраняем по id
             c.execute('''UPDATE notes
@@ -52,7 +52,7 @@ def editNote(id):
             m = hashlib.md5()
             m.update(note)
             c.execute("INSERT INTO notes(note, private, short) VALUES('%s', '%s', '%s')"
-                      % (note, private, m.hexdigest() ))
+                      % (note, private, m.hexdigest()))
             logging.warning('insert! ')
         conn.commit()
         conn.close()
@@ -62,7 +62,7 @@ def editNote(id):
 
     else:  #генерируем страницу редактирования
         logging.warning("gen new edit page " + str(id))
-        if int(id) != 0 and str(id).isdigit():  # ищем по id
+        if id.isdigit() and int(id) != 0:  # ищем по id
             c.execute("SELECT note, private FROM notes WHERE id = '%s'" % id)
             (result, p) = c.fetchone()
             output = template("editnote", note=result, id=id, private=p)
@@ -77,20 +77,19 @@ def editNote(id):
     output = template("header") + output
     return output
 
-@route('/bykey', method='GET')
-def searchByKey(searchkey):
-    bottle.abort(404)
-    logging.warning("search for: " + str(searchkey))
+@route('/key/', method='GET')
+def searchByKey():
     key1 = request.GET.get("key", "").strip()
-
-    return editNote(key1)
+    logging.warning("search for: " + key1)
+    #return editNote(key1)
+    return bottle.redirect("/edit/" + key1)
 
 @route('/demo')
 def addDemoNotes():
     conn = sqlite3.connect('notes.db')
     c = conn.cursor()
     c.execute('create table notes(id INTEGER primary key AUTOINCREMENT, note text not null, private bool, short char(10))')
-    c.execute('''insert into notes(note) values('test!!!')''')
+    c.execute('''insert into notes(note, private, short) values('test!!!',0,'abc')''')
     conn.commit()
     conn.close()
     return "<p>Demo added into DB</p>"

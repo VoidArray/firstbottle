@@ -1,6 +1,3 @@
-<form action="/edit" method="GET">
-    <input type="submit" name="add" value="add">
-</form>
 <p>All notes:</p>
 <table border="1">
 <tr>
@@ -11,7 +8,7 @@
 </tr>
 %for row in rows:
   <tr>
-  %(id, note, priv) = row
+  %(id, note, priv, key) = row
     <td>{{id}}</td>
     <td>
         <p>
@@ -22,6 +19,9 @@
         {{priv}}
     </td>
     <td>
+        {{key}}
+    </td>
+    <td>
         <a href="/edit/{{id}}">Edit</a>
     </td>
   </tr>
@@ -29,7 +29,7 @@
 </table>
 
 <p>Редактирование по ключу:</p>
-<form action="/bykey/" method="GET">
+<form action="/key/" method="GET">
     <div>
         <input size="20" maxlength="20" name="key" value=""/>
         <input type="submit" name="edit" value="Редактировать"/>

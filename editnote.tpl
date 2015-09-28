@@ -19,6 +19,6 @@
         <input type="submit" name="save" value="save"/>
     </div>
     <div>
-        <input type="hidden" name="hash" value="{{id}}"/>
+        <input type="hidden" name="key" value="{{id}}"/>
     </div>
 </form>
