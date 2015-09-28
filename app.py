@@ -31,7 +31,7 @@ def editNote(id):
         private = request.GET.get("private", "").strip()
         savedId = request.GET.get("key").strip()
 
-        if (savedId != 0 and str(savedId).isdigit()):  #пересохраняем по id
+        if (savedId != 0 and isinstance(savedId, int)):  #пересохраняем по id
             c.execute('''UPDATE notes
                 SET note = ?, private = ?
                 where id = ? ''', (note, private, savedId))
@@ -54,18 +54,20 @@ def editNote(id):
 
     else:  #генерируем страницу редактирования
         result = ""
-        priv = 0
+        p = 0
         logging.warning("gen new edit page " + str(id))
         if id.isdigit() and int(id) != 0:  # ищем по id
-            c.execute("SELECT note, private FROM notes WHERE id = ?", id)
-            (result, p) = c.fetchone()
-            output = template("editnote", note=result, id=id, private=p)
+            c.execute("SELECT note, private FROM notes WHERE id = ?", (id,))
+            t = c.fetchone()
+            if isinstance(t, tuple):
+                (result, p) = t
         elif id != "0" and isinstance(id, str):  # ищем по хэшу
             c.execute("SELECT note, short, private FROM notes WHERE short = ?", (id,))
-            (result, findedid, p) = c.fetchone()
-            output = template("editnote", note=result, id=findedid, private=p)
-        else:  # новая заметка
-            output = template("editnote", note="", id=0, private=0)
+            t = c.fetchone()
+            if isinstance(t, tuple):
+                (result, id, p) = t
+        #else:  # новая заметка по-умолчанию
+        output = template("editnote", note=result, id=id, private=p)
 
     return output
 
