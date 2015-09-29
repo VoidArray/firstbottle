@@ -67,8 +67,7 @@ def editNote(id): #генерируем страницу редактирова�
             (id, result, p) = t
         logging.warning("gen edit page hash " + str(t))
     #else:  # новая заметка по-умолчанию
-    output = template("pagebody", content="editnote", note=result, id=id, private=p)
-    return output
+    return template("pagebody", content="editnote", note=result, id=id, private=p)
 
 @route('/key/', method='GET')
 def searchByKey():

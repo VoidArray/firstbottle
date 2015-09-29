@@ -1,7 +1,7 @@
 <html>
 <head>
   <title>Быстрый сайт заметок</title>
-  <link href="main.css" rel="stylesheet" type="text/css"/>
+  <link href="/main.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 % include("header.tpl")
