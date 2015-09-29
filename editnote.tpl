@@ -13,7 +13,7 @@
         %end
     </div>
     <div>
-        <textarea rows="10" cols="30" name="note">{{note}}</textarea>
+        <textarea rows="20" cols="80" name="note">{{note}}</textarea>
     </div>
     <div>
         <input type="submit" name="save" value="save"/>
