@@ -1,5 +1,3 @@
-% include("header.tpl")
-
 %if (id == 0):
     <p>Добавление новой заметки</p>
 %else:
@@ -24,5 +22,3 @@
         <input type="hidden" name="key" value="{{id}}"/>
     </div>
 </form>
-
-% include("footer.tpl")

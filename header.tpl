@@ -1,4 +1,12 @@
-<h1> Быстрый сайт заметок </h1>
-<form action="/edit" method="GET">
-    <input type="submit" name="add" value="Добавить заметку">
-</form>
+<div class="header">
+    <span>
+    <p class="header">Быстрый сайт заметок</p>
+    </span>
+    <span class="submit">
+    <form action="/edit" method="GET">
+        <button name="add" id="mysubmitbutton" type="submit" class="customButton">
+          Добавить заметку
+        </button>
+    </form>
+    </span>
+</div>

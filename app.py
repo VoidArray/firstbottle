@@ -4,7 +4,7 @@ import bottle, sys, sqlite3
 import hashlib
 import logging
 
-from bottle import request, response, run, route, template, error
+from bottle import request, response, run, route, template, error, static_file, get
 
 @route('/ver')
 def index():
@@ -15,7 +15,7 @@ def index():
 def notesList():
     c.execute("SELECT id, note, private, short FROM notes")
     result = c.fetchall()
-    output = template("showlist", rows=result)
+    output = template("pagebody", content="showlist", rows=result)
     return output
 
 @route('/edit')
@@ -50,7 +50,7 @@ def saveNote(): #сохранение редактированной запис�
     bottle.redirect("/")
     return
 
-@route('/edit/<id>', method='GET')
+@route('/edit/<id>', method='GET') # <id:re:[0-9]+>
 def editNote(id): #генерируем страницу редактирования
     result = ""
     p = 0
@@ -67,8 +67,7 @@ def editNote(id): #генерируем страницу редактирова�
             (id, result, p) = t
         logging.warning("gen edit page hash " + str(t))
     #else:  # новая заметка по-умолчанию
-    output = template("editnote", note=result, id=id, private=p)
-
+    output = template("pagebody", content="editnote", note=result, id=id, private=p)
     return output
 
 @route('/key/', method='GET')
@@ -85,11 +84,24 @@ def addDemoNotes():
     conn.commit()
     return "<p>Demo added into DB</p>"
 
-@bottle.error(403)
+# Static Routes
+@get('/<filename:re:.*\.js>')
+def javascripts(filename):
+    return static_file(filename, root='static/js')
+
+@get('/<filename:re:.*\.css>')
+def stylesheets(filename):
+    return static_file(filename, root='static/css')
+
+@get('/<filename:re:.*\.[png|jpg]>')
+def stylesheets(filename):
+    return static_file(filename, root='static/img')
+
+@error(403)
 def mistake403(code):
     return 'There is a mistake in your url!'
 
-@bottle.error(404)
+@error(404)
 def mistake404(code):
     return 'Sorry, this page does not exist!'
 

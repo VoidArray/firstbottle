@@ -1,35 +1,26 @@
-% include("header.tpl")
+<p>Список заметок</p>
 
-<p>All notes:</p>
-<table border="1">
-<tr>
-    <th>id</th>
-    <th>заметка</th>
-    <th>private</th>
-    <th>key</th>
-    <th>edit</th>
-</tr>
 %for row in rows:
-  <tr>
+  <div class="notecontent">
   %(id, note, priv, key) = row
-    <td>{{id}}</td>
-    <td>
-        <p>
+    <div>
+      <span>
+	  <a href="/edit/{{id}}">Редактировать</a>
+      </span>
+      <span>
+	  {{priv}}
+      </span>
+      <span>
+	  {{key}}
+      </span>
+    </div>
+    <div>
+        <p><pre>
             {{note}}
-        </p>
-    </td>
-    <td>
-        {{priv}}
-    </td>
-    <td>
-        {{key}}
-    </td>
-    <td>
-        <a href="/edit/{{id}}">Edit</a>
-    </td>
-  </tr>
+        </pre></p>
+    </div>
+  </div>
 %end
-</table>
 
 <p>Редактирование по ключу:</p>
 <form action="/key/" method="GET">
@@ -38,5 +29,3 @@
         <input type="submit" name="edit" value="Редактировать"/>
     </div>
 </form>
-
-% include("footer.tpl")

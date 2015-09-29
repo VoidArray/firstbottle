@@ -1,1 +1,3 @@
-all rights reserved 2015
+<div>
+<p align="right"> All rights reserved 2015</p>
+</div>
