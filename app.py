@@ -13,9 +13,11 @@ def index():
 @route('/')
 @route('/list')
 def notesList():
-    c.execute("SELECT id, note, private, short FROM notes")
+    c.execute("SELECT id, note FROM notes WHERE private <> 'on'")
     result = c.fetchall()
-    output = template("pagebody", content="showlist", rows=result)
+    message = request.GET.get("message").strip() if request.GET.get("message") else ""
+    logging.warning("message: " + message)
+    output = template("pagebody", content="showlist", rows=result, message=message)
     return output
 
 @route('/edit')
@@ -28,13 +30,17 @@ def saveNote(): #сохранение редактированной запис�
     note = request.GET.get("note", "").strip()
     private = request.GET.get("private", "").strip()
     savedId = request.GET.get("key").strip()
-
+    key = ""
     if savedId == "0": #если id Не был сохранен, создаем новую заметку
         m = hashlib.md5()
         m.update(note)
+        key = m.hexdigest()
         c.execute("INSERT INTO notes(note, private, short) VALUES(?, ?, ?)",
                    (note, private, m.hexdigest()))
         logging.warning('insert! ')
+        bottle.redirect("/list?message=Ключ%20для%20вашей%20заметки%20" + key)
+        return
+
     elif savedId.isdigit() and int(savedId) != 0:  #пересохраняем по id
         c.execute('''UPDATE notes
             SET note = ?, private = ?
@@ -47,7 +53,7 @@ def saveNote(): #сохранение редактированной запис�
         logging.warning('update by hash! ' + str(savedId))
     conn.commit()
 
-    bottle.redirect("/")
+    bottle.redirect("/list")
     return
 
 @route('/edit/<id>', method='GET') # <id:re:[0-9]+>
@@ -67,7 +73,7 @@ def editNote(id): #генерируем страницу редактирова�
             (id, result, p) = t
         logging.warning("gen edit page hash " + str(t))
     #else:  # новая заметка по-умолчанию
-    return template("pagebody", content="editnote", note=result, id=id, private=p)
+    return template("pagebody", content="editnote", note=result, id=id, private=p, message="")
 
 @route('/key/', method='GET')
 def searchByKey():

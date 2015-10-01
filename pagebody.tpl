@@ -6,6 +6,8 @@
 <body>
 % include("header.tpl")
 <div class="maincontent">
+<br>
+{{message}} <!-- сообщение о событии для пользователя-->
 % include(content+".tpl")
 % include("footer.tpl")
 </div>

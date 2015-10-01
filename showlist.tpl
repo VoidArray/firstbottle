@@ -2,16 +2,10 @@
 
 %for row in rows:
   <div class="notecontent">
-  %(id, note, priv, key) = row
+  %(id, note) = row
     <div>
       <span>
 	  <a href="/edit/{{id}}">Редактировать</a>
-      </span>
-      <span>
-	  {{priv}}
-      </span>
-      <span>
-	  {{key}}
       </span>
     </div>
     <div>
